@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  moredakka:
+    image: moredakka
+    build:
+      context: .
+      dockerfile: MoreDakka/Dockerfile

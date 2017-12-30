@@ -17,9 +17,10 @@ namespace MoreDakka.Services
             var seed = Enumerable.Range(1, rnd.Next(1, 10));
             return Source.From(seed).SelectAsync(Constants.DegreesOfParallelism, i=> GetDakkaAsync());
         }
-        private Task<Dakka> GetDakkaAsync()
+        private async Task<Dakka> GetDakkaAsync()
         {
-            return Task.FromResult(new Dakka(1, Constants.Dakka));
+            await Task.Delay(100);
+            return new Dakka(1, Constants.Dakka);
         }
     }
 }

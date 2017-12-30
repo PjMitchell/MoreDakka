@@ -1,6 +1,7 @@
 ﻿using Akka.Actor;
 using MoreDakka.Model;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MoreDakka.Actors
 {
@@ -8,18 +9,34 @@ namespace MoreDakka.Actors
     {
         public DakkaActor()
         {
-            Receive<NeedMoreDakka>(MoreDakkaRequest);
+            //Receive<NeedMoreDakka>(MoreDakkaRequest,null);
+            ReceiveAsync<NeedMoreDakka>(MoreDakkaRequestAsync);
+
+            //Receive<GotMoreDakka>(GotDakkaRequest,null);
         }
 
-        private bool MoreDakkaRequest(NeedMoreDakka request)
+
+        private void MoreDakkaRequest(NeedMoreDakka request)
         {
-            Sender.Tell(Act(request));
+            ActAsync(request).PipeTo(Self,Sender);
+        }
+
+        private void GotDakkaRequest(GotMoreDakka request)
+        {
+            Sender.Tell(request);
+        }
+
+        private async Task<bool> MoreDakkaRequestAsync(NeedMoreDakka request)
+        {
+            var result = await ActAsync(request);
+            Sender.Tell(result);
             return true;
         }
 
-        public GotMoreDakka Act(NeedMoreDakka request)
+
+        public Task<GotMoreDakka> ActAsync(NeedMoreDakka request)
         {
-            return new GotMoreDakka(GetDakka(request.Amount));
+            return Task.FromResult(new GotMoreDakka(GetDakka(request.Amount)));
         }
 
         private Dakka[] GetDakka(int amount)
